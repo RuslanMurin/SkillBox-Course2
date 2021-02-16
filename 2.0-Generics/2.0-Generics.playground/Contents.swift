@@ -39,7 +39,13 @@ func closures<T>(first: @escaping (T)->Void, second: @escaping (T)->Void)->((T)-
 // 7. Создайте расширение для:
 //a) Array, у которого элементы имеют тип Comparable, и добавьте генерируемое свойство, которое возвращает максимальный элемент;
 extension Array where Element: Comparable{
-    var maxEl: Element? { return self.sorted(by: >).first }
+    var maxEl: Element? {
+        var max = self[0]
+        for el in self{
+            if max < el { max = el }
+    }
+    return max
+    }
 }
 let max = [5, 3, 18, 34, 200, 1].maxEl
 //b) Array, у которого элементы имеют тип Equatable, и добавьте функцию, которая удаляет из массива идентичные элементы.
@@ -54,21 +60,14 @@ extension Array where Element: Equatable{
         self = temp
     }
 }
-var array = [5, 6, 7, 3, 6, 33, 6, 18, 15, 5]
-array.removeDuplicates()
+var array = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
+
 extension Array where Element: Hashable {
     mutating func removeDuplicates() {
-        var buffer: [Element] = []
-        var added = Set<Element>()
-        for elem in self {
-            if !added.contains(elem) {
-                buffer.append(elem)
-                added.insert(elem)
-            }
-        }
-        self = buffer
+        self = Array(Set(self))
     }
-}//Так еще можно реализовать
+}//Очень лаконично
+array.removeDuplicates()
 //8. Создайте специальный оператор для:
 //a) возведения Int-числа в степень: оператор ^^, работает 2^3, возвращает 8;
 postfix operator ^^
