@@ -40,7 +40,7 @@ func closures<T>(first: @escaping (T)->Void, second: @escaping (T)->Void)->((T)-
 //a) Array, у которого элементы имеют тип Comparable, и добавьте генерируемое свойство, которое возвращает максимальный элемент;
 extension Array where Element: Comparable{
     var maxEl: Element? {
-        guard !self.isEmpty else { return nil }
+        guard !isEmpty else { return nil }
         var max = self[0]
         for el in self {
             if max < el { max = el }
@@ -66,9 +66,9 @@ var array = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
 
 extension Array where Element: Hashable {
     mutating func removeDuplicates1() {
-        self = Array(_immutableCocoaArray: NSOrderedSet(array: self))
+        self = NSOrderedSet(array: self).array as! [Element]
     }
-}//что не так?
+}
 array.removeDuplicates1()
 //8. Создайте специальный оператор для:
 //a) возведения Int-числа в степень: оператор ^^, работает 2^3, возвращает 8;
