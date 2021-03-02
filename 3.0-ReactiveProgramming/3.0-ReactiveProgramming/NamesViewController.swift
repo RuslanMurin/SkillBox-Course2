@@ -8,12 +8,13 @@ class NamesViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     
     var names = MutableObservableArray(["Johnatan", "James", "Jake", "Martha", "Alex", "Seth", "Mark", "Ilon", "Anthony", "Steve", "Stan", "Tony", "Michael", "Kirk", "Leonard", "Sheldon", "Hovard", "Joe", "Rose", "Jack"])
+    let filteredNames = MutableObservableArray<String>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         namesTableview.keyboardDismissMode = .onDrag
         
-        names.bind(to: namesTableview) { (dataSourse, indexPath, tableView) -> UITableViewCell in
+        filteredNames.bind(to: namesTableview) { (dataSourse, indexPath, tableView) -> UITableViewCell in
             let cell = tableView.dequeueReusableCell(withIdentifier: "NameCell") as! NameTableViewCell
             cell.nameLabel.text = dataSourse[indexPath.row]
             return cell
@@ -21,15 +22,12 @@ class NamesViewController: UIViewController {
         
         searchBar.reactive.text
             .ignoreNils()
-            .filter { $0.count > 0 }
+            .removeDuplicates()
             .throttle(for: 2)
-            .observeNext { text in
-                self.names.filterCollection { $0.contains(text) }
-                    .bind(to: self.namesTableview) { (dataSourse, indexPath, tableView) -> UITableViewCell in
-                        let cell = tableView.dequeueReusableCell(withIdentifier: "NameCell") as! NameTableViewCell
-                        cell.nameLabel.text = dataSourse[indexPath.row]
-                        return cell
-                    }
+            .observeNext { [self] text in
+                text.count > 0
+                    ? self.names.filterCollection { $0.contains(text) }.bind(to: filteredNames)
+                    : self.names.bind(to: filteredNames)
             }
             .dispose(in: reactive.bag)
     }

@@ -11,8 +11,6 @@ class AuthorizeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let status = Property((false, false))
-        
         mailTextfield.reactive.text
             .ignoreNils()
             .filter { $0.count > 0 }
@@ -25,10 +23,9 @@ class AuthorizeViewController: UIViewController {
             .map { $0.count < 6 ? "Пароль слишком короткий" : "" }
             .bind(to: errorLabel.reactive.text)
         
-        status
-            .filter { $0.0 == true && $0.1 == true }
-            .replaceElements(with: true)
-            .bind(to: joinButton.reactive.isEnabled)
-        
+        combineLatest(mailTextfield.reactive.text, passwordTextfield.reactive.text) { mail, pass in
+            return mail?.isValidEmail() ?? true && pass?.count ?? 0 > 6
+        }
+        .bind(to: joinButton.reactive.isEnabled)
     }
 }
