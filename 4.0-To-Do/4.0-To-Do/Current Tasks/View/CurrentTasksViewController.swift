@@ -1,18 +1,19 @@
 import UIKit
 
-class CurrentTasksViewController: UIViewController{
-    
+class CurrentTasksViewController: UIViewController, ViewModelOutput{
     @IBOutlet weak var currentTasksTableView: UITableView!
     
-    private var viewModel = CurrentTasksViewModel.shared
+    private var viewModel: ViewModelInput! = CurrentTasksViewModel.shared
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        viewModel = CurrentTasksViewModel()
-        bindTable()
+        viewModel.output = self
+        updateTable()
+        rowSelected()
     }
     
-    func bindTable() {
+    func updateTable() {
+        viewModel = CurrentTasksViewModel()
         viewModel.tasks.bind(to: currentTasksTableView) { (dataSource, indexPath, tableView) -> UITableViewCell in
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentTaskCell") as! TasksTableViewCell
@@ -26,17 +27,16 @@ class CurrentTasksViewController: UIViewController{
             cell.createdLabel.text = "Created: " + dataSource[indexPath.row].created.formattedDate()
             return cell
         }
-        
+    }
+    
+    func rowSelected() {
         currentTasksTableView.reactive.selectedRowIndexPath.observeNext { indexPath in
-            
             let cell = self.currentTasksTableView.cellForRow(at: indexPath)
-            
             guard let popover = (self.storyboard?.instantiateViewController(withIdentifier: "ActionPopover") as? ActionPopoverViewController) else { return }
-            
             popover.modalPresentationStyle = .popover
             popover.delegate = self
             popover.preferredContentSize = CGSize(width: 100, height: 150)
-            let popoverVC = popover.popoverPresentationController
+            weak var popoverVC = popover.popoverPresentationController
             popoverVC?.delegate = self
             popoverVC?.sourceView = cell
             popoverVC?.sourceRect = CGRect(x: cell?.bounds.midX ?? 50, y: 90, width: 0, height: 0)

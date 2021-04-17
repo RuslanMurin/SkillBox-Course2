@@ -31,7 +31,7 @@ extension CompletedViewController: CompletedPresenterOutput {
         popover.delegate = parent as? CompletedViewController
         popover.task = self.tasks?[indexPath.row]
         popover.preferredContentSize = CGSize(width: 100, height: 150)
-        let popVC = popover.popoverPresentationController
+        weak var popVC = popover.popoverPresentationController
         popVC?.delegate = parent as? UIPopoverPresentationControllerDelegate
         popVC?.sourceView = cell
         popVC?.sourceRect = CGRect(x: cell?.bounds.midX ?? 50, y: 90, width: 0, height: 0)

@@ -3,8 +3,22 @@ import ReactiveKit
 import Bond
 import RealmSwift
 
-class CurrentTasksViewModel {
+protocol ViewModelInput: AnyObject{
+    var tasks: MutableObservableArray<TaskModel> { get set }
+    var output: ViewModelOutput! { get set }
     
+    func deleteTask(key: String)
+    func completeTask(key: String)
+    func restoreTask(key: String)
+}
+
+protocol ViewModelOutput: AnyObject {
+    func updateTable()
+}
+
+class CurrentTasksViewModel: ViewModelInput {
+    
+    weak var output: ViewModelOutput!
     static let shared = CurrentTasksViewModel()
     private let realm = try! Realm()
     
@@ -18,6 +32,7 @@ class CurrentTasksViewModel {
                 realm.delete(object)
             }
         }
+        output.updateTable()
     }
     
     func completeTask(key: String) {
@@ -26,6 +41,7 @@ class CurrentTasksViewModel {
                 object.isCompleted = true
             }
         }
+        output.updateTable()
     }
     
     func restoreTask(key: String) {
@@ -34,5 +50,6 @@ class CurrentTasksViewModel {
                 object.isCompleted = false
             }
         }
+        output.updateTable()
     }
 }

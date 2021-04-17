@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class CompletedPresenter: CompletedPresenterInput {
+class CompletedPresenter: CompletedPresenterInput, CompletedInteractorOutput {
     var output: CompletedPresenterOutput!
     
     var interactor: CompletedInteractorInput! = CompletedInteractor()
@@ -27,10 +27,4 @@ protocol CompletedPresenterInput {
 protocol CompletedPresenterOutput {
     func updateTable(tasks: [TaskModel])
     func setupPopover<T: PopoverViewControllerProtocol>(pop: T, parent: UIViewController, identifier: String, storyboard: UIStoryboard?, tableView: UITableView, indexPath: IndexPath)
-}
-
-extension CompletedPresenter: CompletedInteractorOutput {
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .none
-    }
 }
