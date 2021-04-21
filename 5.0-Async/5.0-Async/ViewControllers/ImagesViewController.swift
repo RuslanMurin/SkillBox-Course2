@@ -6,8 +6,6 @@ class ImagesViewController: UIViewController {
     @IBOutlet weak var secondImageView: UIImageView!
     @IBOutlet weak var textField: UITextField!
     
-    var queue = TestQueue()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         textField.delegate = self
@@ -42,7 +40,6 @@ class ImagesViewController: UIViewController {
 // MARK: - Нажатие Return на клавиатуре
 extension ImagesViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        queue.add()
         guard let number = Int(self.textField.text ?? "") else { return false }
         
         DispatchQueue.global(qos: .background).async {
